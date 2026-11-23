@@ -27,6 +27,8 @@ import {
   DashboardQuickEntryPanel,
 } from "@/components/dashboard/dashboard-quick-entry";
 
+const logger = createLogger("dashboard-payments");
+
 interface Payment {
   id: string;
   amount: string;
