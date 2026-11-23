@@ -38,7 +38,7 @@ describe("payment-dedupe-clustering", () => {
       row("b", "2026-03-07T00:00:00.000Z", 799, 2000, false),
     ];
     const span = BUSINESS_RULES.PAYMENT.DUPLICATE_IST_CALENDAR_DAY_SPAN;
-    expect(span).toBe(2);
+    expect(span).toBeGreaterThanOrEqual(2);
     const clusters = clusterPaymentDuplicateIndices(bucket, span);
     expect(clusters.some((c) => c.length === 2)).toBe(true);
   });

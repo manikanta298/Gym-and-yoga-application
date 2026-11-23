@@ -17,7 +17,7 @@ describe('Plan Inference', () => {
         const result = inferPlanFromAmount(amount);
         expect(result.planId).toBe(DEFAULT_MONTHLY_PLAN_ID);
         expect(result.durationDays).toBe(30);
-        expect(result.confidence).toBe('approximate');
+        expect(result.confidence).toBe('fallback');
       });
     });
 
@@ -40,9 +40,9 @@ describe('Plan Inference', () => {
       expect(result.durationDays).toBe(30);
     });
 
-    it('should always return "approximate" confidence', () => {
+    it('should return "fallback" confidence when no plan catalog is given', () => {
       const result = inferPlanFromAmount(2099);
-      expect(result.confidence).toBe('approximate');
+      expect(result.confidence).toBe('fallback');
     });
   });
 

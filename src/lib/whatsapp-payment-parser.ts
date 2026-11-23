@@ -44,6 +44,9 @@ export type ParsedError = {
 
 export type ParsedPayment = ParsedMemberPayment | ParsedCashOut | ParsedCashUpdate | ParsedError;
 
+/** WhatsApp lines need at least 2 chars for a member name (single letters are almost always typos). */
+const MIN_PAYMENT_NAME_LENGTH = Math.max(2, BUSINESS_RULES.VALIDATION.NAME.MIN_LENGTH);
+
 const AMOUNT_PATTERN = /(\d+(?:\.\d+)?)\s*(?:\/-|₹|rs\.?|inr)?/i;
 const METHOD_MAP: Record<string, 'UPI' | 'CASH' | 'CARD' | 'OTHER'> = {
   upi: 'UPI',
@@ -83,8 +86,20 @@ function parseMemberPaymentLine(line: string, lineNum: number): ParsedMemberPaym
   if (/cash\s*out|box\s*a\s*ache|cash\s*update/i.test(trimmed)) return null;
 
   // Find amount - typically before method words
-  const amountMatch = trimmed.match(/(\d+(?:\.\d+)?)\s*(?:\/-)?/);
-  if (!amountMatch) return null;
+  const firstNumber = trimmed.match(/(\d+(?:\.\d+)?)\s*(?:\/-)?/);
+  if (!firstNumber) return null;
+
+  // If several numbers appear back-to-back ("Rahul 2 800 upi", "123 800 upi"),
+  // the amount is the LAST one in that run; earlier numbers belong to the name.
+  let amountMatch: RegExpMatchArray = firstNumber;
+  let amountIndex = trimmed.indexOf(firstNumber[0]);
+  for (;;) {
+    const rest = trimmed.slice(amountIndex + amountMatch[0].length);
+    const next = rest.match(/^(\d+(?:\.\d+)?)(?![A-Za-z])\s*(?:\/-)?/);
+    if (!next) break;
+    amountIndex = amountIndex + amountMatch[0].length;
+    amountMatch = next;
+  }
 
   const amount = parseFloat(amountMatch[1]);
   
@@ -121,7 +136,6 @@ function parseMemberPaymentLine(line: string, lineNum: number): ParsedMemberPaym
     };
   }
 
-  const amountIndex = trimmed.indexOf(amountMatch[0]);
   const beforeAmount = trimmed.slice(0, amountIndex).trim();
   const afterAmount = trimmed.slice(amountIndex + amountMatch[0].length).trim();
 
@@ -129,11 +143,11 @@ function parseMemberPaymentLine(line: string, lineNum: number): ParsedMemberPaym
   const memberName = beforeAmount.replace(/\s+/g, ' ').trim();
   
   // GUARD: Validate member name length
-  if (!memberName || memberName.length < BUSINESS_RULES.VALIDATION.NAME.MIN_LENGTH) {
+  if (!memberName || memberName.length < MIN_PAYMENT_NAME_LENGTH) {
     logger.warn(`[WHATSAPP] Invalid name (too short) in line ${lineNum}: "${memberName}"`);
     return {
       type: 'error',
-      error: `Invalid name "${memberName}" (minimum ${BUSINESS_RULES.VALIDATION.NAME.MIN_LENGTH} characters)`,
+      error: `Invalid name "${memberName}" (minimum ${MIN_PAYMENT_NAME_LENGTH} characters)`,
       raw: trimmed,
       lineNumber: lineNum,
     };
