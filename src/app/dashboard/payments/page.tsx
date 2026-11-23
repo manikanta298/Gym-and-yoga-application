@@ -53,6 +53,8 @@ interface Payment {
   };
 }
 
+type PaymentApiResponse = { payments: Payment[] } | Payment[];
+
 const DURATION_OPTIONS = [
   { value: "", label: "—" },
   { value: "New Admission", label: "New Admission" },
@@ -209,13 +211,20 @@ export default function PaymentsPage() {
   params.append("includeStats", "false");
   const paymentsUrl = `/api/payments?${params}`;
 
-  const { data, isLoading, error, mutate: fetchPayments } = useSWR(paymentsUrl, swrFetcher, {
+  const { data, isLoading, error, mutate: fetchPayments } = useSWR<PaymentApiResponse>(
+    paymentsUrl,
+    (url: string) => swrFetcher<PaymentApiResponse>(url),
+    {
     revalidateOnMount: true,
   });
 
   useEffect(() => {
     if (data) {
-      const paymentsArray = Array.isArray(data.payments) ? data.payments : Array.isArray(data) ? data : [];
+      const paymentsArray: Payment[] = Array.isArray(data)
+        ? data
+        : Array.isArray(data.payments)
+          ? data.payments
+          : [];
       setPayments(paymentsArray);
     }
   }, [data]);
