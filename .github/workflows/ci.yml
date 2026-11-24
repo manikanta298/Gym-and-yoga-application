@@ -83,6 +83,10 @@ jobs:
       - run: npm ci
       - run: npx prisma generate
       - run: npx prisma migrate deploy
+      # Payment suites reference the demo Account/Gym and the "monthly" plan by fixed ID.
+      # No migration creates them, so seed them before running the tests.
+      - name: Seed demo gym, account and plans
+        run: npm run db:seed-demo-gym
       - name: Payment edge-case suites
         run: |
           npm test -- --testPathPatterns="payment-edge-cases|payment-workflows-integration|payment-dedupe-clustering"

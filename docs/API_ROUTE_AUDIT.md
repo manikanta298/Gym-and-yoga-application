@@ -1,8 +1,8 @@
 # API route audit
 
 Auto-generated route inventory (`npm run audit:api-routes`). Regenerate after API changes.
+Output is deterministic (no timestamps) so CI can detect staleness by exact comparison.
 
-**Generated:** 2026-07-13  
 **Routes:** 169 · **Migrated:** 140 · **Partial:** 29 · **Direct Prisma:** 0
 
 Regenerate: `npm run audit:api-routes`

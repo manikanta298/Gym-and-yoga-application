@@ -66,7 +66,7 @@ function walk(dir, acc = []) {
   return acc;
 }
 
-const rows = walk(apiRoot).map(scanFile).sort((a, b) => a.routePath.localeCompare(b.routePath));
+const rows = walk(apiRoot).map(scanFile).sort((a, b) => (a.routePath < b.routePath ? -1 : a.routePath > b.routePath ? 1 : 0));
 
 const migrated = rows.filter((r) => r.status === "migrated").length;
 const partial = rows.filter((r) => r.status === "partial").length;
@@ -76,8 +76,8 @@ const lines = [
   "# API route audit",
   "",
   "Auto-generated route inventory (`npm run audit:api-routes`). Regenerate after API changes.",
+  "Output is deterministic (no timestamps) so CI can detect staleness by exact comparison.",
   "",
-  `**Generated:** ${new Date().toISOString().slice(0, 10)}  `,
   `**Routes:** ${rows.length} · **Migrated:** ${migrated} · **Partial:** ${partial} · **Direct Prisma:** ${direct}`,
   "",
   "Regenerate: `npm run audit:api-routes`",

@@ -6,10 +6,12 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const apiRoot = path.join(root, "src/app/api");
+// The list stores ESLint-glob-escaped paths ("[[]id[]]"); normalize to real paths ("[id]").
+const unescapeGlob = (p) => p.replace(/\[\[\]/g, "[").replace(/\[\]\]/g, "]");
 const grandfather = new Set(
   JSON.parse(
     fs.readFileSync(path.join(root, "eslint.grandfather-prisma-routes.json"), "utf8"),
-  ),
+  ).map(unescapeGlob),
 );
 const MAX_LINES = Number(process.env.ROUTE_MAX_LINES ?? 80);
 const FAIL = process.env.ROUTE_LINE_LIMIT_STRICT === "1";
