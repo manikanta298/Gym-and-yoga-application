@@ -17,7 +17,7 @@ import {
 
 // Test data helpers
 const createTestUser = async () => {
-  const contactNumber = `9${Math.random().toString().slice(2, 11)}`;
+  const contactNumber = `9${Math.floor(Math.random() * 1e9).toString().padStart(9, "0")}`;
   return prisma.user.create({
     data: {
       contactNumber,
@@ -45,7 +45,7 @@ describe("Payment Workflow Integration", () => {
 
   describe("Complete Admission Flow", () => {
     test("creates member, payment, and membership in one transaction", async () => {
-      const phone = `9${Math.random().toString().slice(2, 11)}`;
+      const phone = `9${Math.floor(Math.random() * 1e9).toString().padStart(9, "0")}`;
       
       const admission = await createAdmission({
         gymId: DEFAULT_DEMO_GYM_ID,
@@ -94,7 +94,7 @@ describe("Payment Workflow Integration", () => {
     });
 
     test("prevents duplicate phone number", async () => {
-      const phone = `9${Math.random().toString().slice(2, 11)}`;
+      const phone = `9${Math.floor(Math.random() * 1e9).toString().padStart(9, "0")}`;
       
       // First admission
       const admission1 = await createAdmission({
@@ -127,7 +127,7 @@ describe("Payment Workflow Integration", () => {
     });
 
     test("infers plan from amount", async () => {
-      const phone = `9${Math.random().toString().slice(2, 11)}`;
+      const phone = `9${Math.floor(Math.random() * 1e9).toString().padStart(9, "0")}`;
       
       const admission = await createAdmission({
         gymId: DEFAULT_DEMO_GYM_ID,
@@ -152,7 +152,7 @@ describe("Payment Workflow Integration", () => {
 
   describe("Complete Renewal Flow", () => {
     test("extends active membership correctly", async () => {
-      const phone = `9${Math.random().toString().slice(2, 11)}`;
+      const phone = `9${Math.floor(Math.random() * 1e9).toString().padStart(9, "0")}`;
       
       // Create initial admission
       const admission = await createAdmission({
@@ -205,12 +205,12 @@ describe("Payment Workflow Integration", () => {
     });
 
     test("starts new period for expired membership", async () => {
-      const phone = `9${Math.random().toString().slice(2, 11)}`;
+      const phone = `9${Math.floor(Math.random() * 1e9).toString().padStart(9, "0")}`;
       
       // Create member with expired membership
       const member = await prisma.member.create({
         data: {
-          id: `MEM-TEST-${Date.now()}`,
+          id: `MEM-TEST-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           gymId: DEFAULT_DEMO_GYM_ID,
           name: "Expired Member",
           phone,
@@ -263,7 +263,7 @@ describe("Payment Workflow Integration", () => {
     });
 
     test("handles multiple rapid renewals", async () => {
-      const phone = `9${Math.random().toString().slice(2, 11)}`;
+      const phone = `9${Math.floor(Math.random() * 1e9).toString().padStart(9, "0")}`;
       
       // Create initial admission
       const admission = await createAdmission({
@@ -339,7 +339,7 @@ describe("Payment Workflow Integration", () => {
 
   describe("Month/Year Field Integration", () => {
     test("populates month/year across admission and renewals", async () => {
-      const phone = `9${Math.random().toString().slice(2, 11)}`;
+      const phone = `9${Math.floor(Math.random() * 1e9).toString().padStart(9, "0")}`;
       
       // Admission in March
       const admission = await createAdmission({

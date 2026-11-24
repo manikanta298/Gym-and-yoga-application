@@ -420,7 +420,7 @@ export default function PaymentsPage() {
           )}
           <Button
             type="button"
-            onClick={fetchPayments}
+            onClick={() => fetchPayments()}
             disabled={isLoading}
             className="inline-flex items-center gap-1.5 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50 text-sm font-medium"
           >

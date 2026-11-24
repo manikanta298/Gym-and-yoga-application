@@ -19,10 +19,10 @@ import {
 
 // Test data helpers
 const createTestMember = async (overrides = {}) => {
-  const phone = `9${Math.random().toString().slice(2, 11)}`;
+  const phone = `9${Math.floor(Math.random() * 1e9).toString().padStart(9, "0")}`;
   return prisma.member.create({
     data: {
-      id: `MEM-TEST-${Date.now()}`,
+      id: `MEM-TEST-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       gymId: DEFAULT_DEMO_GYM_ID,
       name: "Test Member",
       phone,
@@ -34,7 +34,7 @@ const createTestMember = async (overrides = {}) => {
 };
 
 const createTestUser = async () => {
-  const contactNumber = `9${Math.random().toString().slice(2, 11)}`;
+  const contactNumber = `9${Math.floor(Math.random() * 1e9).toString().padStart(9, "0")}`;
   return prisma.user.create({
     data: {
       contactNumber,
